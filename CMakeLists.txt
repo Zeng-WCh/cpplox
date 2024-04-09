@@ -4,6 +4,11 @@ project(cpplox)
 
 message(STATUS "Project Name: " ${PROJECT_NAME})
 
+# Check if os is Linux, else exit
+if (NOT UNIX)
+    message(FATAL_ERROR "This project is only supported on Linux")
+endif()
+
 # Set compiler to clang++
 set (CMAKE_CXX_COMPILER, clang++)
 

@@ -7,66 +7,115 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <fcntl.h>
 #include <fstream>
 #include <string>
+#include <unistd.h>
 #include <vector>
+
+class File {
+private:
+  static constexpr std::size_t FILE_BUF_SIZE = 64;
+  const std::string filename;
+  int fd;
+  char *buffer;
+  std::size_t buffer_size;
+  char *current, *end;
+  std::size_t line, column, offset;
+
+  bool newline;
+
+protected:
+  // Check if buffer is empty
+  inline bool buffer_empty() const { return this->current == this->end; }
+  // Check if EOF
+  inline bool eof() const { return *(this->current) == EOF; }
+  // Read a buf_size chunk of data from the file
+  void read_a_chunk();
+
+  void update_pos(bool newline = false);
+
+public:
+  inline File(const std::string &filename)
+      : filename(filename), fd(-1), buffer(nullptr), buffer_size(FILE_BUF_SIZE),
+        current(nullptr), end(nullptr), line(1), column(0), offset(0),
+        newline(false) {
+    if (filename == "-") {
+      this->fd = STDIN_FILENO;
+    } else {
+      // Open file (read-only mode
+      this->fd = open(filename.c_str(), O_RDONLY);
+      if (this->fd == -1) {
+        // Error
+        fprintf(stderr, "Unable to open file %s\n", filename.c_str());
+        // change to stdin
+        fd = STDIN_FILENO;
+      }
+    }
+
+    this->buffer = (char *)malloc(sizeof(char) * this->buffer_size);
+
+    if (this->buffer == nullptr) {
+      // Error
+      fprintf(stderr, "Unable to allocate memory for file buffer\n");
+      exit(EXIT_FAILURE);
+    }
+
+    memset(this->buffer, 0, this->buffer_size);
+
+    this->current = this->buffer;
+    this->end = this->buffer;
+  }
+
+  inline File() : File("-") {}
+
+  File(const File &) = delete;
+  File(const File &&) = delete;
+
+  inline ~File() {
+    if (this->fd != STDIN_FILENO && this->fd != -1) {
+      close(this->fd);
+    }
+    free(this->buffer);
+  }
+
+  inline bool is_from_file() const { return this->fd != STDIN_FILENO; }
+  inline std::size_t get_line() const { return this->line; }
+  inline std::size_t get_column() const { return this->column; }
+  inline std::size_t get_offset() const { return this->offset; }
+
+  inline bool is_eof() const { return this->eof(); }
+
+  char next_char();
+
+  char peek() const;
+};
 
 class Scanner {
 private:
-  std::string source;
+  File *f;
   std::vector<Token> tokens;
-  std::size_t line, column, offset;
-  std::ifstream input;
-
-  bool from_stdin;
-
-  /**
-   * buffer is used to store the current line of input
-   * only used in interactive
-   */
-  std::string buffer;
-  int lastChar;
-  std::size_t idx;
+  int lastchar;
 
 protected:
-  void fill_buffer();
-  /**
-   * Internal method, used to fill the tokens
-   */
-  void advance();
-  void advance_in_buffer();
-  void advance_in_file();
-
-  int next_char();
+  int get_char();
 
 public:
-  inline Scanner()
-      : source("-"), tokens(), line(0), column(0), offset(0), input(),
-        from_stdin(true), buffer(), lastChar(' ') {}
-
   inline Scanner(const std::string &filename)
-      : source(filename), tokens(), line(0), column(0), offset(0),
-        from_stdin(false), buffer(), lastChar(' ') {
-    this->input.open(this->source, std::ios::in);
-    if (!this->input.is_open()) {
-      fprintf(stderr, "Unable to open file: %s\n", filename.c_str());
-      exit(1);
-    }
-  }
+      : f(new File(filename)), lastchar(' ') {}
 
-  inline ~Scanner() {
-    if ((!this->from_stdin) && this->input.is_open()) {
-      this->input.close();
-    }
-  }
+  inline Scanner() : f(new File()), lastchar(' ') {}
 
-  inline std::size_t getLine() const { return this->line; }
-  inline std::size_t getColumn() const { return this->column; }
-  inline std::size_t getOffset() const { return this->offset; }
+  Scanner(const Scanner &) = delete;
+  Scanner(const Scanner &&) = delete;
 
-  Token &next();
+  inline ~Scanner() { delete this->f; }
 
-  void clean();
+  Token &next_token();
+  Token &peek_token() const;
+
+  inline bool is_eof() const { return this->f->is_eof(); }
 };
 
 #endif

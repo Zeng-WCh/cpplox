@@ -1,4 +1,5 @@
 #pragma once
+#include <ostream>
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
 
@@ -6,64 +7,58 @@
 
 enum TokenType {
   tok_eof = -1,
-  // types
-  tok_var = 256,
-  tok_func,
 
-  // keywords
-  tok_class,
-  tok_this,
-  tok_super,
+  // One character
+  tok_lparen = 257, // '(
+  tok_rparen,       // ')
+  tok_lbracket,     // '[
+  tok_rbracket,     // ']
+  tok_lbrace,       // '{'
+  tok_rbrace,       // '}'
+  tok_comma,        // ','
+  tok_dot,          // '.'
+  tok_colon,        // ':'
+  tok_semicolon,    // ';'
+  tok_plus,         // '+'
+  tok_minus,        // '-'
+  tok_star,         // '*'
+  tok_slash,        // '/'
+  tok_not,          // '!'
+  tok_assign,       // '='
+  tok_lt,           // '<'
+  tok_gt,           // '>'
 
-  // control flow
-  tok_if,
-  tok_else,
-  tok_while,
-  tok_for,
-  tok_break,
-  tok_continue,
-  tok_return,
-
-  // modules
-  tok_import,
-  tok_as,
-  toko_from,
-
-  tok_colon,     // ':'
-  tok_semicolon, // ';'
-  // operators
-  tok_assign,     // '='
-  tok_gr,         // '>'
-  tok_less,       // '<'
-  tok_ge,         // '>='
-  tok_le,         // '<='
-  tok_and,        // 'and'
-  tok_or,         // 'or'
-  tok_eq,         // '=='
-  tok_ne,         // '!='
-  tok_add,        // '+'
-  tok_sub,        // '-'
-  tok_mul,        // '*'
-  tok_div,        // '/'
-  tok_self_add,   // '++'
-  tok_self_sub,   // '--'
-  tok_add_assign, // '+='
-  tok_sub_assign, // '-='
-  tok_mul_assign, // '*='
-  tok_div_assign, // '/='
-  tok_dot,        // '.'
-  tok_comma,      // ','
-  tok_lp,         // '('
-  tok_rp,         // ')'
-  tok_lbracket,   // '['
-  tok_rbracket,   // ']'
-  tok_lbrace,     // '{'
-  tok_rbrace,     // '}'
+  // Multi character
+  tok_ge, // '>='
+  tok_le, // '<='
+  tok_eq, // '=='
+  tok_ne, // '!='
 
   // literals
-  tok_true,
-  tok_false,
-  tok_nil, // works as null in C
+  tok_ident,
+  tok_number,
+  tok_string,
+
+  // keywords
+  tok_and,    // 'and'
+  tok_class,  // 'class'
+  tok_else,   // 'else'
+  tok_false,  // 'false'
+  tok_func,   // 'func'
+  tok_for,    // 'for'
+  tok_if,     // 'if'
+  tok_nil,    // 'nil'
+  tok_or,     // 'or'
+  tok_return, // 'return'
+  tok_super,  // 'super'
+  tok_this,   // 'this'
+  tok_true,   // 'true'
+  tok_var,    // 'var'
+  tok_while,  // 'while'
+  tok_list,   // 'list'
+
+  // built-in functions
+  tok_print, // 'print'
 };
 
 class Token {
@@ -86,7 +81,11 @@ public:
   inline std::size_t getLine() const { return line; }
   inline std::size_t getColumn() const { return column; }
   inline std::size_t getOffset() const { return offset; }
+
+  // friend std::ostream &operator<<(std::ostream &, const Token &);
 };
+std::ostream &operator<<(std::ostream &out, const Token &t);
+std::ostream &operator<<(std::ostream &out, const TokenType &t);
 
 // template <class T> class TokenWithValue : public Token {
 // private:

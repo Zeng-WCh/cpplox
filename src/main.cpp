@@ -1,4 +1,5 @@
 #include "scanner.h"
+#include <cstring>
 #include <iostream>
 
 using namespace std;
@@ -13,7 +14,7 @@ int main(int argc, const char **argv) {
     sc = new Scanner();
   } else if (argc == 2) {
     // file = new File(argv[1]);
-    if (strcmp(argv[1], "--help") == 0) {
+    if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) {
       fprintf(stderr, msg, argv[0]);
       return 0;
     }

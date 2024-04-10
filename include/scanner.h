@@ -73,6 +73,7 @@ public:
 
   File(const File &) = delete;
   File(const File &&) = delete;
+  File &operator=(const File &) = delete;
 
   inline ~File() {
     if (this->fd != STDIN_FILENO && this->fd != -1) {
@@ -110,6 +111,7 @@ public:
 
   Scanner(const Scanner &) = delete;
   Scanner(const Scanner &&) = delete;
+  Scanner &operator=(const Scanner &) = delete;
 
   inline ~Scanner() { delete this->f; }
 

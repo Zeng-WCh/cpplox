@@ -5,20 +5,18 @@
 #include <cstring>
 #include <fcntl.h>
 #include <iostream>
-#include <map>
 #include <ostream>
 #include <unistd.h>
+#include <unordered_map>
 
 namespace {
-static std::map<std::string, TokenType> keywords = {
+const static std::unordered_map<std::string, TokenType> keywords = {
     {"and", tok_and},     {"class", tok_class},   {"else", tok_else},
     {"false", tok_false}, {"true", tok_true},     {"func", tok_func},
     {"for", tok_for},     {"if", tok_if},         {"nil", tok_nil},
     {"or", tok_or},       {"return", tok_return}, {"super", tok_super},
     {"this", tok_this},   {"var", tok_var},       {"while", tok_while},
-    {"list", tok_list},   {"print", tok_print}
-
-};
+    {"list", tok_list},   {"print", tok_print}};
 }
 
 std::ostream &operator<<(std::ostream &out, const TokenType &t) {
@@ -453,7 +451,7 @@ Token &Scanner::next_token() {
   }
 
   // identifier of keyword
-  if (std::isalpha(this->lastchar)) {
+  if (std::isalpha(this->lastchar) || this->lastchar == '_') {
     std::string lexeme = "";
     std::size_t line = this->f->get_line();
     std::size_t column = this->f->get_column();

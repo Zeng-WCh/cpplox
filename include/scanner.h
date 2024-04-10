@@ -48,7 +48,8 @@ public:
       this->fd = open(filename.c_str(), O_RDONLY);
       if (this->fd == -1) {
         // Error
-        fprintf(stderr, "Unable to open file %s\n", filename.c_str());
+        fprintf(stderr, "Unable to open file %s, using input...\n",
+                filename.c_str());
         // change to stdin
         fd = STDIN_FILENO;
       }

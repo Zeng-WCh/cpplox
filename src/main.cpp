@@ -13,6 +13,10 @@ int main(int argc, const char **argv) {
     sc = new Scanner();
   } else if (argc == 2) {
     // file = new File(argv[1]);
+    if (strcmp(argv[1], "--help") == 0) {
+      fprintf(stderr, msg, argv[0]);
+      return 0;
+    }
     sc = new Scanner(argv[1]);
   } else {
     fprintf(stderr, msg, argv[0]);

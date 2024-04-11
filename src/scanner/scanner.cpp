@@ -221,6 +221,10 @@ char File::peek() const { return *(this->current); }
 int Scanner::get_char() { return this->f->next_char(); }
 
 Token &Scanner::next_token() {
+  if (this->stop) {
+    this->stop = false;
+    return this->peek_token();
+  }
   while (isspace(this->lastchar)) {
     this->lastchar = this->get_char();
   }

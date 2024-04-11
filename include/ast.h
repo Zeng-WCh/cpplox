@@ -44,6 +44,8 @@ public:
   ~Program();
 
   void print(int indent) override;
+
+  inline void add_decl(Declaration *decl) { this->decls.push_back(decl); }
 };
 
 class Declaration : public Ast {
@@ -59,7 +61,8 @@ inline Declaration::~Declaration() {
 class ClassDeclaration : public Declaration {
 private:
   std::vector<Func *> methods;
-  std::string name, parent;
+  std::string name;
+  ClassDeclaration *superclass;
 
 public:
   ClassDeclaration() = default;

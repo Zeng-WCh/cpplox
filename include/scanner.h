@@ -86,6 +86,12 @@ public:
   inline std::size_t get_line() const { return this->line; }
   inline std::size_t get_column() const { return this->column; }
   inline std::size_t get_offset() const { return this->offset; }
+  inline const char *get_file() const {
+    if (this->fd != STDIN_FILENO) {
+      return this->filename.c_str();
+    }
+    return "stdin";
+  }
 
   inline bool is_eof() const { return this->eof(); }
 
@@ -99,15 +105,16 @@ private:
   File *f;
   std::vector<Token> tokens;
   int lastchar;
+  bool stop;
 
 protected:
   int get_char();
 
 public:
   inline Scanner(const std::string &filename)
-      : f(new File(filename)), lastchar(' ') {}
+      : f(new File(filename)), lastchar(' '), stop(false) {}
 
-  inline Scanner() : f(new File()), lastchar(' ') {}
+  inline Scanner() : f(new File()), lastchar(' '), stop(false) {}
 
   Scanner(const Scanner &) = delete;
   Scanner(const Scanner &&) = delete;
@@ -116,9 +123,13 @@ public:
   inline ~Scanner() { delete this->f; }
 
   Token &next_token();
-  Token &peek_token() const;
+  inline Token &peek_token() { return this->tokens.back(); }
 
   inline bool is_eof() const { return this->f->is_eof(); }
+
+  inline void stop_scanning() { this->stop = true; }
+
+  inline const char *get_file() const { return this->f->get_file(); }
 };
 
 #endif
